@@ -52,14 +52,16 @@ Three coach personalities and four accent themes. The persona changes the voice 
 
 The full bundle contains the app, the Python runtime, the trained adapter, the retrieval index and the Qwen2.5-7B model. It is roughly 22 GB because the model ships inside it, which is what lets it work offline forever after the first launch.
 
-**[Download from Hugging Face](https://huggingface.co/Fungle/lolcoach-windows)**, or pull it from the command line:
+**[Download LoLCoach-windows-x64.zip](https://huggingface.co/Fungle/lolcoach-windows/resolve/main/LoLCoach-windows-x64.zip)** (22.2 GB)
+
+Or from the command line, which resumes if the connection drops:
 
 ```bash
 pip install huggingface_hub
-huggingface-cli download Fungle/lolcoach-windows --local-dir LoLCoach
+huggingface-cli download Fungle/lolcoach-windows LoLCoach-windows-x64.zip --local-dir .
 ```
 
-Then run `LoLCoach\LoLCoach.exe`. It ships with an empty match library, so you sync your own games on first run.
+Extract the zip anywhere, keep the folder together, and run `LoLCoach.exe`. It ships with an empty match library, so you sync your own games on first run.
 
 It is hosted on Hugging Face rather than a GitHub release because GitHub caps release assets at 2 GB per file. See [DISTRIBUTION.md](DISTRIBUTION.md) for the other options and for how to build a much smaller download.
 
