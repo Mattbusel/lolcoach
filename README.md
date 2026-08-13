@@ -4,7 +4,9 @@
 
 It downloads your own ranked games from Riot, works out what actually happened in them (wave states, jungle paths, why each death happened, where the game swung), then lets you talk to a fine-tuned AI about it for as long as you like. No subscription, no cloud, no per-message cost. The model is on your machine.
 
-### [Download LoLCoach for Windows](#download)
+### [Download LoLCoach for Windows](https://huggingface.co/Fungle/lolcoach-windows)
+
+*Roughly 22.6 GB. Runs offline once downloaded.*
 
 ![The review screen](docs/screenshots/01-review.png)
 
@@ -50,7 +52,16 @@ Three coach personalities and four accent themes. The persona changes the voice 
 
 The full bundle contains the app, the Python runtime, the trained adapter, the retrieval index and the Qwen2.5-7B model. It is roughly 22 GB because the model ships inside it, which is what lets it work offline forever after the first launch.
 
-> **Hosting note.** GitHub caps release assets at 2 GB per file, and a bundled 7B model does not fit in that. See [DISTRIBUTION.md](DISTRIBUTION.md) for where the prebuilt download lives and the options for hosting it.
+**[Download from Hugging Face](https://huggingface.co/Fungle/lolcoach-windows)**, or pull it from the command line:
+
+```bash
+pip install huggingface_hub
+huggingface-cli download Fungle/lolcoach-windows --local-dir LoLCoach
+```
+
+Then run `LoLCoach\LoLCoach.exe`. It ships with an empty match library, so you sync your own games on first run.
+
+It is hosted on Hugging Face rather than a GitHub release because GitHub caps release assets at 2 GB per file. See [DISTRIBUTION.md](DISTRIBUTION.md) for the other options and for how to build a much smaller download.
 
 **Build it yourself.** One command, needs Python 3.12 and an NVIDIA GPU:
 
