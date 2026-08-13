@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LoLCoach</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="mark">LC</span><h1>LoLCoach</h1></div>
+  <span class="spacer"></span>
+  <span id="riotPill" class="pill"><i class="dot"></i><span>Checking…</span></span>
+  <button id="progressBtn" class="btn ghost" title="Your progress across games">Progress</button>
+  <button id="reqBtn" class="btn ghost" title="System requirements and check">Requirements</button>
+  <button id="settingsBtn" class="btn ghost" title="Account and key settings">Settings</button>
+  <button id="refreshBtn" class="btn icon ghost" title="Refresh (R)" aria-label="Refresh">&#10227;</button>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Your games">
+    <div class="rail-head">
+      <div class="rail-title"><span>Your games</span><span id="matchCount" class="dim"></span></div>
+      <input id="search" class="input" type="search" placeholder="Filter by champion or patch" aria-label="Filter games">
+      <div class="chips" style="margin-top:8px"><button id="mineToggle" class="chip" aria-pressed="true">Only my games</button></div>
+    </div>
+    <div id="matchList" class="rail-list" role="list">
+      <div class="skeleton sk-row"></div>
+      <div class="skeleton sk-row"></div>
+      <div class="skeleton sk-row"></div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="pad">
+      <div id="setup"></div>
+      <div id="review">
+        <div class="empty">
+          <div class="big">&#9906;</div>
+          <h3>No game selected</h3>
+          <p>Pick a game on the left, or collect your matches to get started.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

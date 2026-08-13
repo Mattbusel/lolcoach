@@ -1,0 +1,76 @@
+# LoLCoach operational defaults. Copy this file and pass --config for overrides.
+# Set data_root to an absolute path to keep large raw data, indexes, and adapters elsewhere.
+data_root: null
+user_agent: "lolcoach/1.0 (local research pipeline)"
+http_timeout: 60.0
+http_retries: 4
+
+riot:
+  platforms: ["na1", "euw1", "kr"]
+  tiers: ["CHALLENGER", "GRANDMASTER", "MASTER"]
+  queue_id: 420
+  players_per_platform: 200
+  matches_per_player: 20
+  max_matches: 20000
+
+sources:
+  ddragon: true
+  cdragon: true
+  oracles_elixir: true
+  oracles_elixir_years: [2024, 2025, 2026]
+  wiki: true
+  wiki_max_pages: 1200
+  patch_notes: true
+  patch_notes_limit: 40
+  reddit: true
+  reddit_posts_per_sub: 1500
+  reddit_min_score: 25
+  huggingface: true
+  github: true
+  kaggle: true
+  riot: true
+  replays: true
+  auto_discover: true
+
+dataset:
+  max_examples: 400000
+  min_wave_confidence: 0.45
+  val_fraction: 0.02
+  test_fraction: 0.01
+  dedupe: true
+  max_per_archetype: 60000
+  # Stage 3 is opt-in through `prepare_dataset --synthetic`; keep default runs local.
+  synthetic_backend: "none"
+  synthetic_max_examples: 20000
+  synthetic_concurrency: 4
+
+rag:
+  embed_model: "sentence-transformers/all-MiniLM-L6-v2"
+  embed_batch_size: 128
+  chunk_tokens: 320
+  chunk_overlap: 64
+  top_k: 8
+  dense_weight: 0.65
+  patch_boost: 0.12
+
+train:
+  base_model: "Qwen/Qwen2.5-7B-Instruct"
+  output_name: "qwen-lolcoach"
+  use_unsloth: true
+  load_in_4bit: true
+  lora_dropout: 0.05
+  epochs: 3.0
+  warmup_ratio: 0.03
+  weight_decay: 0.01
+  seed: 3407
+  gradient_checkpointing: true
+  save_every_epoch: true
+  resume: true
+
+eval:
+  n_questions: 1000
+  # `none` keeps scoring fully local. Set to anthropic or openai only when desired.
+  judge_backend: "none"
+  competitors: ["anthropic", "openai", "deepseek"]
+  max_new_tokens: 512
+  consistency_pairs: 100

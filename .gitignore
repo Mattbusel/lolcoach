@@ -1,0 +1,13 @@
+# Data, models and indexes are large and licence-encumbered; never commit them.
+data/
+unsloth_compiled_cache/
+*.egg-info/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.env
+.test-tmp*/
+.hf-cache/
+build/
+dist/
