@@ -4,9 +4,9 @@
 
 It downloads your own ranked games from Riot, works out what actually happened in them (wave states, jungle paths, why each death happened, where the game swung), then lets you talk to a fine-tuned AI about it for as long as you like. No subscription, no cloud, no per-message cost. The model is on your machine.
 
-### [Download LoLCoach for Windows](https://huggingface.co/Fungle/lolcoach-windows)
+### [Download LoLCoach for Windows](https://github.com/Mattbusel/lolcoach/releases/latest)
 
-*Roughly 22.6 GB. Runs offline once downloaded.*
+*The review app is about 20 MB: grab `lolcoach-review-...-windows-x86_64.zip`, unzip, double-click `LoLCoach.exe`. Want the AI chat too? The [full bundle](https://huggingface.co/Fungle/lolcoach-windows) is roughly 22.6 GB and runs offline once downloaded.*
 
 ![The review screen](docs/screenshots/01-review.png)
 
@@ -50,6 +50,29 @@ Three coach personalities and four accent themes. The persona changes the voice 
 
 ## Download
 
+There are two downloads. Most people should start with the first one.
+
+### 1. The review app (about 20 MB)
+
+Everything except the AI chat: your games, the minimap, gold curve, wave states, why each death happened, coaching moments and your progress across games. No GPU needed.
+
+Get it from the **[latest release](https://github.com/Mattbusel/lolcoach/releases/latest)**:
+
+| Your computer | File to download |
+| --- | --- |
+| Windows 10 or 11 | `lolcoach-review-vX.Y.Z-windows-x86_64.zip` |
+| Mac with Apple Silicon (M1 and later) | `lolcoach-review-vX.Y.Z-macos-arm64.tar.gz` |
+| Mac with Intel | `lolcoach-review-vX.Y.Z-macos-x86_64.tar.gz` |
+| Linux | `lolcoach-review-vX.Y.Z-linux-x86_64.tar.gz` |
+
+On Windows, unzip it and double-click `LoLCoach.exe`. A small window opens and shows the address, and your browser opens the app at `http://127.0.0.1:8765`. Keep that window open while you use LoLCoach; close it to quit. Your data is kept in `%LOCALAPPDATA%\LoLCoach\data`.
+
+The app is not code-signed, so Windows SmartScreen may say "Windows protected your PC" or "unknown publisher". Click **More info**, then **Run anyway**. On a Mac, right-click `LoLCoach` and choose **Open** the first time (or run `xattr -d com.apple.quarantine LoLCoach` in Terminal).
+
+LoLCoach never reads the League client or touches the game. It only talks to Riot's official web API with your own key.
+
+### 2. The full bundle with the AI coach (about 22 GB)
+
 The full bundle contains the app, the Python runtime, the trained adapter, the retrieval index and the Qwen2.5-7B model. It is roughly 22 GB because the model ships inside it, which is what lets it work offline forever after the first launch.
 
 **[Download LoLCoach-windows-x64.zip](https://huggingface.co/Fungle/lolcoach-windows/resolve/main/LoLCoach-windows-x64.zip)** (22.2 GB)
@@ -63,9 +86,22 @@ huggingface-cli download Fungle/lolcoach-windows LoLCoach-windows-x64.zip --loca
 
 Extract the zip anywhere, keep the folder together, and run `LoLCoach.exe`. It ships with an empty match library, so you sync your own games on first run.
 
-It is hosted on Hugging Face rather than a GitHub release because GitHub caps release assets at 2 GB per file. See [DISTRIBUTION.md](DISTRIBUTION.md) for the other options and for how to build a much smaller download.
+It is hosted on Hugging Face rather than a GitHub release because GitHub caps release assets at 2 GB per file. See [DISTRIBUTION.md](DISTRIBUTION.md) for the other options.
 
-**Build it yourself.** One command, needs Python 3.12 and an NVIDIA GPU:
+### Install with pipx
+
+For the command line pipeline (`lolcoach download_data`, `train`, `ui` and the rest):
+
+```bash
+pipx install git+https://github.com/Mattbusel/lolcoach
+lolcoach ui
+```
+
+This installs the full dependency list, including PyTorch and transformers, so it is a multi-gigabyte install. LoLCoach is not published on PyPI.
+
+### Build from source
+
+**The full bundle.** One command, needs Python 3.12 and an NVIDIA GPU:
 
 ```powershell
 git clone https://github.com/Mattbusel/lolcoach.git
@@ -75,6 +111,14 @@ powershell -ExecutionPolicy Bypass -File scripts\build_windows.ps1
 ```
 
 The bundle lands in `dist\LoLCoach\`. Double click `LoLCoach.exe`.
+
+**The review app only**, without PyTorch (this is what the release workflow builds):
+
+```powershell
+python -m pip install -r packaging/requirements-review.txt pyinstaller
+python -m pip install --no-deps .
+python -m PyInstaller --onefile --console --name LoLCoach --paths . --add-data "configs:configs" --add-data "lolcoach/web:lolcoach/web" --collect-submodules lolcoach --collect-submodules uvicorn lolcoach/launcher.py
+```
 
 ## System requirements
 
@@ -167,7 +211,7 @@ This project does not scrape VODs, does not bypass platform authentication and d
 
 ```powershell
 python -m pip install -e ".[ui,judges]"
-python -m pytest          # 87 tests
+python -m pytest          # 89 tests
 python -m lolcoach.cli ui
 ```
 

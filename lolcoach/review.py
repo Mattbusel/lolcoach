@@ -277,6 +277,29 @@ class ReviewStore:
         return sorted(moments, key=lambda item: (-int(item["importance"]), int(item["ts_ms"]), item["kind"]))
 
 
+#: Shown in the chat panel when the AI stack is not installed, which is the
+#: case for the small review-only download.
+COACH_NOT_BUNDLED = (
+    "The AI chat is not included in this download. Everything else works: your "
+    "games, the minimap, wave states, deaths and progress. To talk to the coach, "
+    "get the full Windows bundle or install from source with an NVIDIA GPU; see "
+    "the README at github.com/Mattbusel/lolcoach.")
+
+
+def _missing_coach_runtime() -> list[str]:
+    """Names of the chat's heavy dependencies that are not importable."""
+    import importlib.util
+
+    missing = []
+    for name in ("torch", "transformers", "peft"):
+        try:
+            if importlib.util.find_spec(name) is None:
+                missing.append(name)
+        except (ImportError, ValueError):
+            missing.append(name)
+    return missing
+
+
 def create_app(cfg: Config):
     """Create the FastAPI app lazily so the core CLI stays dependency-light."""
     try:
@@ -305,6 +328,15 @@ def create_app(cfg: Config):
     def _preload_coach() -> None:
         nonlocal coach, coach_error
         started = time.time()
+        missing = _missing_coach_runtime()
+        if missing:
+            # The review-only download ships without PyTorch and the model
+            # stack. Say so plainly instead of surfacing an ImportError.
+            with coach_lock:
+                coach_error = COACH_NOT_BUNDLED
+                coach_state.update(state="unavailable", detail=COACH_NOT_BUNDLED,
+                                   missing=missing)
+            return
         try:
             from .chat import LocalCoach
 
@@ -623,6 +655,9 @@ def create_app(cfg: Config):
                 with coach_lock:
                     ready = coach is not None
                     failed = coach_error
+                if failed == COACH_NOT_BUNDLED:
+                    yield failed
+                    return
                 if failed:
                     yield ("The local coach could not start on this machine.\n\n"
                            f"{failed}\n\nRun `lolcoach doctor` for the details.")

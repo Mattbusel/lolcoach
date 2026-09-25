@@ -73,9 +73,29 @@ def _configure_model_cache() -> None:
         os.environ.setdefault("HF_HUB_CACHE", str(bundled / "hub"))
 
 
-def main() -> None:
+def _parse_args(argv: list[str] | None):
+    import argparse
+
+    from lolcoach import __version__
+
+    parser = argparse.ArgumentParser(
+        prog="LoLCoach",
+        description="Open the LoLCoach match review app in your browser. It serves only on "
+                    "this machine (127.0.0.1) and never reads the League client.",
+        epilog="Data lives in %LOCALAPPDATA%\\LoLCoach\\data unless a data folder sits "
+               "beside the executable or LOLCOACH_HOME is set.",
+    )
+    parser.add_argument("--port", type=int, default=8765, help="local port (default 8765)")
+    parser.add_argument("--no-browser", action="store_true",
+                        help="start the server without opening a browser tab")
+    parser.add_argument("--version", action="version", version=f"LoLCoach {__version__}")
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> None:
     """Open the local match-review app, reporting startup errors without a console."""
     _configure_windowed_streams()
+    args = _parse_args(argv)
     _configure_data_root()
     _configure_model_cache()
     # PyInstaller executes this file as the top-level entry script, so these
@@ -84,6 +104,10 @@ def main() -> None:
     from lolcoach.review import serve
 
     cfg = load_config(None)
+    url = f"http://127.0.0.1:{args.port}"
+    print(f"LoLCoach is starting at {url}")
+    print(f"Your data folder: {cfg.paths.root}")
+    print("Keep this window open while you use LoLCoach. Close it to quit.", flush=True)
     try:
         # The packaged build opens the browser rather than a native window.
         # pywebview drives WebView2 through pythonnet, and inside a frozen
@@ -91,10 +115,11 @@ def main() -> None:
         # _internal\webview\lib, so assembly resolution is unreliable. The
         # browser path is deterministic; `lolcoach ui --native` still offers
         # the window when running from source.
-        serve(cfg, host="127.0.0.1", port=8765, open_browser=True, native=False)
+        serve(cfg, host="127.0.0.1", port=args.port, open_browser=not args.no_browser,
+              native=False)
     except OSError as exc:
         if getattr(exc, "winerror", None) == 10048:
-            _show_error("LoLCoach is already running. Open http://127.0.0.1:8765 in your browser.")
+            _show_error(f"LoLCoach is already running. Open {url} in your browser.")
             return
         _write_startup_error(traceback.format_exc())
         _show_error(f"LoLCoach could not start: {exc}")
