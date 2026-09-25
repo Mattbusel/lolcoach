@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+
+PackageIdentifier: Mattbusel.LoLCoach
+PackageVersion: 1.1.1
+PackageLocale: en-US
+Publisher: Mattbusel
+PublisherUrl: https://github.com/Mattbusel
+PublisherSupportUrl: https://github.com/Mattbusel/lolcoach/issues
+PackageName: LoLCoach
+PackageUrl: https://github.com/Mattbusel/lolcoach
+License: MIT
+LicenseUrl: https://github.com/Mattbusel/lolcoach/blob/main/LICENSE
+ShortDescription: "Review your League of Legends games locally: waves, deaths, gold swings"
+Description: "LoLCoach downloads your own ranked League of Legends games with your Riot API key and reviews them on your PC: a replayable minimap, wave states, why each death happened, the biggest gold swing, and your most expensive habit across games. This is the review app; the AI chat ships separately as a large bundle."
+Tags:
+- league-of-legends
+- lol
+- coaching
+- esports
+- match-review
+ReleaseNotesUrl: https://github.com/Mattbusel/lolcoach/releases/tag/v1.1.1
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0
