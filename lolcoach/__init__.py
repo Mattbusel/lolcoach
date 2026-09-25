@@ -20,6 +20,6 @@ Every stage is independently runnable and writes its outputs under the data
 root (see :mod:`lolcoach.paths`), so a pipeline can be resumed from any point.
 """
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 __all__ = ["__version__"]

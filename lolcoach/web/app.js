@@ -96,7 +96,7 @@ const api = {
       });
     } catch (error) {
       if (error.name === 'AbortError') {
-        throw new Error('Riot did not answer in time. Nothing was saved — try again.');
+        throw new Error('Riot did not answer in time. Nothing was saved; try again.');
       }
       throw error;
     } finally {
@@ -604,7 +604,7 @@ async function renderRequirements() {
  *
  * The previous version faked ``riot_configured: false`` to reopen the key
  * form, which meant a linked user had no route back to the Riot ID field at
- * all — the one thing they are most likely to have typed wrong. Both are
+ * all: the one thing they are most likely to have typed wrong. Both are
  * offered here, independently. */
 function renderSettings() {
   const status = state.status || {};
@@ -714,7 +714,7 @@ let collectionTimer = null;
 /* Watch the sync worker.
  *
  * Deliberately idempotent and self-owning. The previous version cleared its
- * own timer on every call, and renderSetup() called it — while loadStatus()
+ * own timer on every call, and renderSetup() called it, while loadStatus()
  * calls renderSetup(). So a routine status refresh during a sync silently
  * stopped the progress updates while the work carried on in the background,
  * which looks exactly like the app freezing mid-sync. The timer is now only
@@ -788,7 +788,7 @@ function renderMatchList() {
     const won = match.win;
     const chip = won === 1 ? '<span class="result-chip win">VICTORY</span>'
       : won === 0 ? '<span class="result-chip loss">DEFEAT</span>'
-      : '<span class="result-chip none">—</span>';
+      : '<span class="result-chip none">n/a</span>';
     const duration = match.duration_s ? `${Math.round(match.duration_s / 60)} min` : 'unknown length';
     const button = el('button', 'match-item');
     button.setAttribute('role', 'listitem');
@@ -1159,8 +1159,8 @@ async function loadInsights() {
 
   box.innerHTML = cards
     ? `<p class="dim" style="font-size:11px;margin-bottom:8px">
-         ${payload.player_identified ? 'What stood out in your game' : 'What stood out in this game'}
-         — click one to ask about it.
+         ${payload.player_identified ? 'What stood out in your game.' : 'What stood out in this game.'}
+         Click one to ask about it.
        </p>
        <div class="moments" style="max-height:none;margin-bottom:14px">${cards}</div>`
     : '';

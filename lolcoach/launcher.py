@@ -79,11 +79,18 @@ def _parse_args(argv: list[str] | None):
     from lolcoach import __version__
 
     parser = argparse.ArgumentParser(
-        prog="LoLCoach",
-        description="Open the LoLCoach match review app in your browser. It serves only on "
+        prog=Path(sys.argv[0]).stem if getattr(sys, "frozen", False) else "LoLCoach",
+        description="Open the LoLCoach match review app in your browser. It serves only on\n"
                     "this machine (127.0.0.1) and never reads the League client.",
-        epilog="Data lives in %LOCALAPPDATA%\\LoLCoach\\data unless a data folder sits "
-               "beside the executable or LOLCOACH_HOME is set.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="examples:\n"
+               "  %(prog)s              open the app in your browser\n"
+               "  %(prog)s --port 9000  use another port if 8765 is taken\n"
+               "  %(prog)s --no-browser start the server only, then open the address yourself\n"
+               "\n"
+               "Your data lives in %%LOCALAPPDATA%%\\LoLCoach\\data on Windows and in\n"
+               "~/AppData/Local/LoLCoach/data elsewhere, unless a data folder sits beside\n"
+               "the executable or LOLCOACH_HOME is set.",
     )
     parser.add_argument("--port", type=int, default=8765, help="local port (default 8765)")
     parser.add_argument("--no-browser", action="store_true",
@@ -107,7 +114,11 @@ def main(argv: list[str] | None = None) -> None:
     url = f"http://127.0.0.1:{args.port}"
     print(f"LoLCoach is starting at {url}")
     print(f"Your data folder: {cfg.paths.root}")
-    print("Keep this window open while you use LoLCoach. Close it to quit.", flush=True)
+    if args.no_browser:
+        print(f"Open {url} in your browser.")
+    else:
+        print("Your browser will open the app. If it does not, open the address above.")
+    print("Keep this window open while you use LoLCoach. Press Ctrl+C or close it to quit.", flush=True)
     try:
         # The packaged build opens the browser rather than a native window.
         # pywebview drives WebView2 through pythonnet, and inside a frozen

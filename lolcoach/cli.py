@@ -239,7 +239,7 @@ def rag(
     typer.echo(context)
     typer.echo("\nSources:")
     for hit in hits:
-        typer.echo(f"- {hit.source}: {hit.title or 'untitled'} (score {hit.score:.3f})" + (f" — {hit.url}" if hit.url else ""))
+        typer.echo(f"- {hit.source}: {hit.title or 'untitled'} (score {hit.score:.3f})" + (f": {hit.url}" if hit.url else ""))
 
 
 @app.command(name="train")
@@ -280,7 +280,7 @@ def chat(
     typer.echo(answer.answer)
     typer.echo("\nSources:")
     for hit in answer.sources:
-        typer.echo(f"- {hit.source}: {hit.title or 'untitled'}" + (f" — {hit.url}" if hit.url else ""))
+        typer.echo(f"- {hit.source}: {hit.title or 'untitled'}" + (f": {hit.url}" if hit.url else ""))
 
 
 @app.command(name="update_patch")

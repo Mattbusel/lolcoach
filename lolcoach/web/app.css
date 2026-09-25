@@ -1,4 +1,4 @@
-/* LoLCoach review UI — "Hextech Archive".
+/* LoLCoach review UI: "Hextech Archive".
  *
  * Art direction
  * -------------
@@ -529,3 +529,28 @@ kbd {
 }
 .swatch:hover { transform: scale(1.08); }
 .swatch[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* ----------------------------------------------------------------- phones
+ * Below 760px the two-pane shell becomes one scrolling column: the header
+ * wraps, the game list turns into a horizontal strip of cards, and every
+ * grid collapses to a single track so nothing forces sideways scrolling. */
+
+.pill { white-space: nowrap; }
+
+@media (max-width: 760px) {
+  body { overflow: auto; }
+  .topbar { height: auto; flex-wrap: wrap; gap: var(--s2); padding: var(--s2) var(--s3); }
+  .topbar .spacer { display: none; }
+  .brand { flex: 1 1 auto; }
+  .topbar .btn.ghost { padding: 7px 9px; font-size: 12px; }
+  .shell { display: block; height: auto; }
+  .rail { border-right: 0; border-bottom: 1px solid var(--line); }
+  .rail-list { display: flex; gap: var(--s1); overflow-x: auto; overflow-y: hidden; padding-bottom: var(--s2); }
+  .match-item { flex: 0 0 auto; width: auto; min-width: 176px; margin-bottom: 0; }
+  .main { overflow: visible; }
+  .pad { padding: var(--s3); }
+  .split, .teams { grid-template-columns: minmax(0, 1fr); }
+  .form-row .input { min-width: 0; flex-basis: 100%; }
+  .bar-row { grid-template-columns: 96px minmax(0, 1fr) 30px; }
+  h2 { font-size: 18px; }
+}
