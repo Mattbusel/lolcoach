@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+
+PackageIdentifier: Mattbusel.LoLCoach
+PackageVersion: 1.1.1
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+- RelativeFilePath: lolcoach-review-v1.1.1-windows-x86_64\LoLCoach.exe
+  PortableCommandAlias: lolcoach
+Installers:
+- Architecture: x64
+  InstallerUrl: https://github.com/Mattbusel/lolcoach/releases/download/v1.1.1/lolcoach-review-v1.1.1-windows-x86_64.zip
+  InstallerSha256: 5E8BE8CEBD9F0626B051210F04652876AA1D75542B16E4BD8201B8CCD34F4BC4
+ManifestType: installer
+ManifestVersion: 1.6.0
