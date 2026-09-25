@@ -71,6 +71,9 @@ conversational coach is missing. That artifact fits in a GitHub release
 comfortably and is the right default for most people, with the full bundle
 offered separately for anyone who wants the AI.
 
-This split is not implemented yet. It needs a second PyInstaller spec with
-those modules excluded and a guard in the UI that hides the chat panel when
-the coach is unavailable, which the app already reports through `/api/coach`.
+This split is implemented. `.github/workflows/release.yml` builds the review
+app (about 20 MB, single file) for Windows, macOS and Linux on every `v*` tag
+and attaches it to the GitHub Release. It installs only
+`packaging/requirements-review.txt`, so PyTorch and the model stack are never
+bundled, and the UI reports the chat as "not in this download" through
+`/api/coach`.

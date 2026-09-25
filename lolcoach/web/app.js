@@ -1197,6 +1197,7 @@ async function pollCoach() {
       loading: ['warn', 'warming up…'],
       ready: ['ok', 'ready'],
       error: ['warn', 'unavailable'],
+      unavailable: ['', 'not in this download'],
     };
     const [cls, label] = map[snapshot.state] || ['', snapshot.state];
     pill.className = `pill ${cls}`;

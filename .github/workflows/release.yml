@@ -1,0 +1,175 @@
+name: Release
+
+# Push a tag like v1.1.0 to build the review-only LoLCoach app as a
+# single-file executable for Windows, macOS and Linux and attach it to a
+# GitHub Release. The review build has everything except the AI chat, which
+# needs PyTorch and a 15 GB model and ships separately on Hugging Face.
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+  # Build-only dry run when this workflow or the packaging changes.
+  pull_request:
+    paths:
+      - ".github/workflows/release.yml"
+      - "packaging/**"
+      - "lolcoach/launcher.py"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to (re)build, e.g. v1.1.0"
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  # Archive prefix and executable name.
+  PKG: lolcoach-review
+  EXE: LoLCoach
+  TAG: ${{ github.event_name == 'pull_request' && 'pr-test' || github.event.inputs.tag || github.ref_name }}
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: windows-x86_64
+          - os: macos-14
+            target: macos-arm64
+          - os: macos-15-intel
+            target: macos-x86_64
+          - os: ubuntu-22.04
+            target: linux-x86_64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.sha || env.TAG }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install (review runtime only, no PyTorch)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r packaging/requirements-review.txt "pyinstaller>=6.10"
+          python -m pip install --no-deps .
+
+      - name: Build
+        shell: bash
+        run: >
+          python -m PyInstaller --noconfirm --onefile --console --name "$EXE" --paths .
+          --add-data "configs:configs"
+          --add-data "lolcoach/web:lolcoach/web"
+          --collect-submodules lolcoach --collect-submodules uvicorn
+          --exclude-module torch --exclude-module tensorflow
+          lolcoach/launcher.py
+
+      - name: Smoke test the bundled binary
+        shell: bash
+        run: |
+          exe="dist/$EXE"; [ "$RUNNER_OS" = "Windows" ] && exe="$exe.exe"
+          "$exe" --version
+          "$exe" --help
+          # Serve the review app from an empty data folder and check that the
+          # page loads and the coach reports itself as not bundled.
+          export LOLCOACH_HOME="$RUNNER_TEMP/lolcoach-data"
+          "$exe" --no-browser --port 8799 > server.log 2>&1 &
+          pid=$!
+          state=""
+          for i in $(seq 1 240); do
+            state=$(curl -s --noproxy '*' http://127.0.0.1:8799/api/coach || true)
+            case "$state" in *'"unavailable"'*) break ;; esac
+            sleep 1
+          done
+          page=$(curl -s --noproxy '*' -o /dev/null -w "%{http_code}" http://127.0.0.1:8799/ || true)
+          kill "$pid" 2>/dev/null || true
+          cat server.log
+          echo "coach: $state"
+          echo "index: $page"
+          case "$state" in *'"unavailable"'*) ;; *) echo "review app did not come up"; exit 1 ;; esac
+          [ "$page" = "200" ] || { echo "index page did not load"; exit 1; }
+
+      - name: Package (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          name="$PKG-$TAG-${{ matrix.target }}"
+          mkdir "$name"
+          cp "dist/$EXE" README.md LICENSE "$name/"
+          tar czf "$name.tar.gz" "$name"
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $name = "$env:PKG-$env:TAG-${{ matrix.target }}"
+          New-Item -ItemType Directory $name | Out-Null
+          Copy-Item "dist/$env:EXE.exe", README.md, LICENSE $name
+          Compress-Archive -Path $name -DestinationPath "$name.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: |
+            ${{ env.PKG }}-*.tar.gz
+            ${{ env.PKG }}-*.zip
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums and release notes
+        run: |
+          cd dist
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          cd ..
+          version="${TAG#v}"
+          # The CHANGELOG section for this version, without its heading.
+          awk -v v="$version" '
+            /^## / { if (found) exit; if (index($0, "[" v "]") || index($0, " " v)) { found = 1; next } }
+            found { print }
+          ' CHANGELOG.md > notes.md
+          {
+            echo
+            echo "### Downloads"
+            echo
+            echo "- Windows: \`$PKG-$TAG-windows-x86_64.zip\` (unzip, double-click \`LoLCoach.exe\`)"
+            echo "- macOS Apple Silicon: \`$PKG-$TAG-macos-arm64.tar.gz\`"
+            echo "- macOS Intel: \`$PKG-$TAG-macos-x86_64.tar.gz\`"
+            echo "- Linux: \`$PKG-$TAG-linux-x86_64.tar.gz\`"
+            echo
+            echo "This is the review build: your games, minimap, wave states, deaths and progress, without the AI chat. The full Windows bundle with the local AI coach (about 22 GB) is on Hugging Face, linked from the README."
+            echo
+            echo "The binaries are unsigned. Windows SmartScreen may say \"unknown publisher\": click More info, then Run anyway. On macOS, right-click the binary and choose Open the first time. Checksums are in \`SHA256SUMS.txt\`."
+          } >> notes.md
+          cat notes.md
+
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          ls -l dist
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --clobber
+          else
+            gh release create "$TAG" dist/* --title "LoLCoach $TAG" --notes-file notes.md
+          fi

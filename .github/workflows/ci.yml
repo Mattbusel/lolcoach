@@ -1,0 +1,28 @@
+name: CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  test:
+    # The suite needs no GPU and no model: the chat stack is imported lazily.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install (without the PyTorch/model stack)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r packaging/requirements-review.txt pandas numpy tqdm orjson pytest
+          python -m pip install --no-deps -e .
+      - name: Tests
+        run: python -m pytest
+      - name: Launcher answers --version
+        run: python -m lolcoach.launcher --version
