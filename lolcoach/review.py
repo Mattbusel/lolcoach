@@ -497,7 +497,7 @@ def create_app(cfg: Config):
                     if not region:
                         raise RuntimeError(
                             "Riot did not return match history for your account on "
-                            "any region just now. This is usually temporary — try "
+                            "any region just now. This is usually temporary; try "
                             "Sync again in a moment.")
                     save_player_region(region)
                     cfg.creds["LOLCOACH_REGION"] = region
@@ -538,7 +538,7 @@ def create_app(cfg: Config):
                               + (f" and derived {derived.waves} wave states" if derived else "")
                               + f". You now have {mine} of your own games ready to review.")
                 elif summary["found"]:
-                    detail = (f"You are up to date — all {summary['found']} of your recent games "
+                    detail = (f"You are up to date: all {summary['found']} of your recent games "
                               f"were already stored. {mine} games ready to review.")
                 else:
                     detail = ("Riot returned no recent games for your account on "

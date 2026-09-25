@@ -1,18 +1,51 @@
+<p align="center">
+  <img src="docs/assets/banner.png" alt="LoLCoach: post-game review for League of Legends. Replays your ranked games on your own PC and tells you why each death happened, what every wave was doing, and where the game swung." width="100%">
+</p>
+
 # LoLCoach
 
-**A League of Legends coach that runs entirely on your PC.**
+**Replays your League of Legends games on your own PC and shows you why you died, what each wave was doing, and where the game slipped away.**
 
-It downloads your own ranked games from Riot, works out what actually happened in them (wave states, jungle paths, why each death happened, where the game swung), then lets you talk to a fine-tuned AI about it for as long as you like. No subscription, no cloud, no per-message cost. The model is on your machine.
+<p align="center">
+  <img src="docs/assets/demo.gif" alt="Recording of the LoLCoach review app: opening a Vel'Koz game, replaying the minimap, jumping to a death, then the Progress view showing the most expensive habit across 26 games" width="900">
+</p>
 
-### [Download LoLCoach for Windows](https://github.com/Mattbusel/lolcoach/releases/latest)
+<sub>A real recording of the v1.1 review app, made today on the author's own 26 ranked games. No Riot key was loaded for the recording, which is why the header says "No Riot key".</sub>
 
-*The review app is about 20 MB: grab `lolcoach-review-...-windows-x86_64.zip`, unzip, double-click `LoLCoach.exe`. Want the AI chat too? The [full bundle](https://huggingface.co/Fungle/lolcoach-windows) is roughly 22.6 GB and runs offline once downloaded.*
+## Install
 
-![The review screen](docs/screenshots/01-review.png)
+| Where | One line |
+| --- | --- |
+| **Windows** (PowerShell) | `irm https://raw.githubusercontent.com/Mattbusel/lolcoach/main/install.ps1 \| iex` |
+| **macOS / Linux** | `curl -fsSL https://raw.githubusercontent.com/Mattbusel/lolcoach/main/install.sh \| sh` |
+| **Homebrew** (macOS, Linux) | `brew install mattbusel/tap/lolcoach` |
+| **Scoop** (Windows) | `scoop bucket add mattbusel https://github.com/Mattbusel/scoop-bucket; scoop install mattbusel/lolcoach` |
+| **Just download it** | [Latest release](https://github.com/Mattbusel/lolcoach/releases/latest): unzip `lolcoach-review-...-windows-x86_64.zip` and double-click `LoLCoach.exe` |
+| **With the AI chat** (Windows, 22 GB) | [Full bundle on Hugging Face](https://huggingface.co/Fungle/lolcoach-windows/resolve/main/LoLCoach-windows-x64.zip), see [below](#the-full-bundle-with-the-ai-coach-about-22-gb) |
+
+Every installer above gets the same 20 MB review app and checks it against the release's `SHA256SUMS.txt`. Nothing touches the League client.
+
+## Use it in 3 steps
+
+1. **Start it.** Run `lolcoach` (or double-click `LoLCoach.exe`). Your browser opens `http://127.0.0.1:8765`, served only on your machine. Keep the small terminal window open; close it to quit.
+2. **Connect your account.** Paste a free Riot API key from [developer.riotgames.com](https://developer.riotgames.com) and your Riot ID as `GameName#TAG`, then press **Validate & save**. The key is checked with Riot and stored only on this PC.
+3. **Review.** Press **Sync my games**, pick a game on the left, press **Space** to replay the minimap, and click any coaching moment to jump to it. **Progress** shows the habit that costs you most across all your games.
+
+## Results
+
+What the app showed in today's recording, from 26 of the author's ranked games:
+
+| | |
+| --- | --- |
+| Most expensive habit | Dying in teamfights: 171 of 234 deaths, 73% of the total |
+| Trend | Improving, from 10.92 to 7.08 deaths per game |
+| One 32 minute Vel'Koz game | 427 coaching moments, 133 wave calls, 10 objectives, 18 recalls |
+
+![The review screen for one game](docs/screenshots/01-review.png)
 
 ---
 
-## What makes it different
+## What it finds in your games
 
 Most League tools show you statistics you already knew. LoLCoach reconstructs the decisions.
 
@@ -28,7 +61,7 @@ Every inference carries a confidence, because a one minute sampling grid genuine
 
 ## Talk to it
 
-The AI runs locally, so conversation is unlimited and costs nothing. Ask anything about any moment in any of your games.
+The AI runs locally, so conversation is unlimited and costs nothing. The chat is in the [full bundle](#the-full-bundle-with-the-ai-coach-about-22-gb); the 20 MB review app says so plainly instead. Ask anything about any moment in any of your games.
 
 ![Asking the coach](docs/screenshots/02-chat.png)
 
@@ -46,17 +79,12 @@ Three coach personalities and four accent themes. The persona changes the voice 
 
 ![Settings and personality](docs/screenshots/05-settings.png)
 
----
+## Downloads in detail
 
-## Download
-
-There are two downloads. Most people should start with the first one.
-
-### 1. The review app (about 20 MB)
+<details>
+<summary><b>The review app (about 20 MB), per platform</b></summary>
 
 Everything except the AI chat: your games, the minimap, gold curve, wave states, why each death happened, coaching moments and your progress across games. No GPU needed.
-
-Get it from the **[latest release](https://github.com/Mattbusel/lolcoach/releases/latest)**:
 
 | Your computer | File to download |
 | --- | --- |
@@ -65,30 +93,27 @@ Get it from the **[latest release](https://github.com/Mattbusel/lolcoach/release
 | Mac with Intel | `lolcoach-review-vX.Y.Z-macos-x86_64.tar.gz` |
 | Linux | `lolcoach-review-vX.Y.Z-linux-x86_64.tar.gz` |
 
-On Windows, unzip it and double-click `LoLCoach.exe`. A small window opens and shows the address, and your browser opens the app at `http://127.0.0.1:8765`. Keep that window open while you use LoLCoach; close it to quit. Your data is kept in `%LOCALAPPDATA%\LoLCoach\data`.
+The app is not code-signed, so Windows SmartScreen may say "Windows protected your PC" or "unknown publisher". Click **More info**, then **Run anyway**. On a Mac, right-click `LoLCoach` and choose **Open** the first time (or run `xattr -d com.apple.quarantine LoLCoach`). The install scripts and Homebrew avoid both prompts.
 
-The app is not code-signed, so Windows SmartScreen may say "Windows protected your PC" or "unknown publisher". Click **More info**, then **Run anyway**. On a Mac, right-click `LoLCoach` and choose **Open** the first time (or run `xattr -d com.apple.quarantine LoLCoach` in Terminal).
+Options: `lolcoach --port 9000` if 8765 is taken, `lolcoach --no-browser` to start the server only, `lolcoach --help` for the rest. Your data is kept in `%LOCALAPPDATA%\LoLCoach\data` on Windows and `~/AppData/Local/LoLCoach/data` elsewhere, or wherever `LOLCOACH_HOME` points.
 
-LoLCoach never reads the League client or touches the game. It only talks to Riot's official web API with your own key.
+</details>
 
-### 2. The full bundle with the AI coach (about 22 GB)
+### The full bundle with the AI coach (about 22 GB)
 
-The full bundle contains the app, the Python runtime, the trained adapter, the retrieval index and the Qwen2.5-7B model. It is roughly 22 GB because the model ships inside it, which is what lets it work offline forever after the first launch.
+The full bundle contains the app, the Python runtime, the trained adapter, the retrieval index and the Qwen2.5-7B model. It is roughly 22 GB because the model ships inside it, which is what lets it work offline after the first launch.
 
-**[Download LoLCoach-windows-x64.zip](https://huggingface.co/Fungle/lolcoach-windows/resolve/main/LoLCoach-windows-x64.zip)** (22.2 GB)
-
-Or from the command line, which resumes if the connection drops:
+**[Download LoLCoach-windows-x64.zip](https://huggingface.co/Fungle/lolcoach-windows/resolve/main/LoLCoach-windows-x64.zip)** (22.2 GB), or resume-safe from the command line:
 
 ```bash
 pip install huggingface_hub
 huggingface-cli download Fungle/lolcoach-windows LoLCoach-windows-x64.zip --local-dir .
 ```
 
-Extract the zip anywhere, keep the folder together, and run `LoLCoach.exe`. It ships with an empty match library, so you sync your own games on first run.
+Extract the zip anywhere, keep the folder together, and run `LoLCoach.exe`. It ships with an empty match library, so you sync your own games on first run. It is hosted on Hugging Face because GitHub caps release assets at 2 GB per file; see [DISTRIBUTION.md](DISTRIBUTION.md).
 
-It is hosted on Hugging Face rather than a GitHub release because GitHub caps release assets at 2 GB per file. See [DISTRIBUTION.md](DISTRIBUTION.md) for the other options.
-
-### Install with pipx
+<details>
+<summary><b>pipx and building from source</b></summary>
 
 For the command line pipeline (`lolcoach download_data`, `train`, `ui` and the rest):
 
@@ -97,17 +122,15 @@ pipx install git+https://github.com/Mattbusel/lolcoach
 lolcoach ui
 ```
 
-This installs the full dependency list, including PyTorch and transformers, so it is a multi-gigabyte install. LoLCoach is not published on PyPI.
+This installs the full dependency list, including PyTorch and transformers, so it is a multi-gigabyte install, and its `lolcoach` command is the full pipeline CLI rather than the review app launcher. LoLCoach is not on PyPI.
 
-### Build from source
-
-**The full bundle.** One command, needs Python 3.12 and an NVIDIA GPU:
+**The full bundle.** Needs Python 3.12 and an NVIDIA GPU:
 
 ```powershell
 git clone https://github.com/Mattbusel/lolcoach.git
 cd lolcoach
 python -m pip install -e ".[ui,bundle]"
-powershell -ExecutionPolicy Bypass -File scripts\build_windows.ps1
+powershell -ExecutionPolicy Bypass -File scriptsuild_windows.ps1
 ```
 
 The bundle lands in `dist\LoLCoach\`. Double click `LoLCoach.exe`.
@@ -119,6 +142,8 @@ python -m pip install -r packaging/requirements-review.txt pyinstaller
 python -m pip install --no-deps .
 python -m PyInstaller --onefile --console --name LoLCoach --paths . --add-data "configs:configs" --add-data "lolcoach/web:lolcoach/web" --collect-submodules lolcoach --collect-submodules uvicorn lolcoach/launcher.py
 ```
+
+</details>
 
 ## System requirements
 
@@ -145,13 +170,6 @@ The app checks your own machine. Open it and click **Requirements**.
 | Driver | Recent NVIDIA driver with CUDA 12 support |
 
 Without a supported GPU the full match review still works. Only the chat is slow or unavailable.
-
-## Getting started
-
-1. Launch the app. It opens at `http://127.0.0.1:8765` and serves only on your machine.
-2. Paste a Riot API key. It is validated with Riot and saved only on this PC.
-3. Add your Riot ID as `GameName#TAG`. LoLCoach works out which region serves your history.
-4. Press **Sync my games**. Your matches download, features are derived, and the review fills in.
 
 ## How it works
 
